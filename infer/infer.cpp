@@ -1,8 +1,7 @@
 #include <iostream>
 #include "alloc.h"
 #include "alloc_cpu.h"
-
-std::shared_ptr<CpuAlloc> CpuAllocFactory::cpu_allocator_ = nullptr;
+#include "buffer.h"
 
 int main(){
     CpuAlloc allocator{};
@@ -29,5 +28,8 @@ int main(){
     std::cout<<"is delete or not"<<(!ptr3)<<std::endl;
     std::cout<<"is delete or not"<<(!ptr4)<<std::endl;
 
+    auto buffer_ptr = std::make_shared<Buffer>(32, only_allocater, base::DeviceAllocType::CPU);
+    std::cout<<"Buffer size "<<buffer_ptr->size()<<std::endl;
+    Buffer buffer{32, only_allocater, base::DeviceAllocType::CPU};
     return 0;
 }
