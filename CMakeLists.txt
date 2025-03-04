@@ -9,6 +9,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB INFER_SOURCES "infer/src/*.cpp")
+
+#外部依赖
+find_package(Armadillo REQUIRED)
+find_package(GTest REQUIRED)
+
 # 添加可执行文件
 add_executable(SyInfer
     ${INFER_SOURCES}
@@ -21,11 +26,12 @@ target_include_directories(SyInfer PUBLIC
 )
 
 # 添加库（如果有）
-# target_link_libraries(SyInfer PRIVATE some_library)
+target_link_libraries(SyInfer PRIVATE armadillo gtest)
 
 # 安装目标（可选）
 
+add_subdirectory(infer)
 
 # 测试（可选）
-# enable_testing()
-# add_subdirectory(tests)
+enable_testing()
+add_subdirectory(tests)

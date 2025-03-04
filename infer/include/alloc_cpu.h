@@ -6,7 +6,7 @@
 
 class CpuAlloc: public DeviceAlloc{
 public:
-    CpuAlloc():DeviceAlloc(base::DeviceAllocType::CPU){}
+    CpuAlloc():DeviceAlloc(base::DeviceType::CPU){}
     ~CpuAlloc() = default;
     void* allocate(size_t size) override;
     void deallocate(void* ptr) override;

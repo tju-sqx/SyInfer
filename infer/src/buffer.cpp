@@ -1,8 +1,9 @@
 #include "buffer.h"
+#include <iostream>
 
 Buffer::Buffer(size_t size, std::shared_ptr<DeviceAlloc> allocator, 
-base::DeviceAllocType type): allocator_(allocator), device_type_(type), size_(size){
-
+base::DeviceType type): allocator_(allocator), device_type_(type), size_(size){
+    
 }
 
 Buffer::~Buffer(){
@@ -16,11 +17,11 @@ bool Buffer::create(){
     if(allocator_ == nullptr || size_ == 0){
         return false;  
     }
-    if(base::DeviceAllocType::UNKNOWN == device_type_){
+    if(base::DeviceType::UNKNOWN == device_type_){
         return false;
     }
 
-    if(base::DeviceAllocType::CPU == device_type_) {
+    if(base::DeviceType::CPU == device_type_) {
         buffer_ptr_ = allocator_->allocate(size_);
         return true;
     }
