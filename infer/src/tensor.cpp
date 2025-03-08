@@ -25,3 +25,10 @@ const size_t Tensor::cal_size() {
 size_t Tensor::dim() const{
     return dims_.size();
 }
+
+base::DeviceType Tensor::device_type() const {
+    if(!buffer_ptr_) {
+        return base::DeviceType::UNKNOWN;
+    }
+    return buffer_ptr_->device_type();
+}

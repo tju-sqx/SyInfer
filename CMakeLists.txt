@@ -13,7 +13,9 @@ file(GLOB INFER_SOURCES "infer/src/*.cpp")
 #外部依赖
 find_package(Armadillo REQUIRED)
 find_package(GTest REQUIRED)
+find_package(glog REQUIRED)
 
+# 包含头文件目录
 # 添加可执行文件
 add_executable(SyInfer
     ${INFER_SOURCES}
@@ -26,7 +28,7 @@ target_include_directories(SyInfer PUBLIC
 )
 
 # 添加库（如果有）
-target_link_libraries(SyInfer PRIVATE armadillo gtest)
+target_link_libraries(SyInfer PRIVATE armadillo gtest glog::glog)
 
 # 安装目标（可选）
 

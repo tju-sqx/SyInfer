@@ -19,7 +19,7 @@ public:
     ~Tensor() = default;
     size_t dim() const;
     bool create();
-
+    base::DeviceType device_type() const;
     template<typename T> 
     const T* data() const;
 
@@ -33,6 +33,7 @@ public:
     const size_t byte_size() const{
         return bytes_size_;
     }
+
 };
 
 template<typename T>

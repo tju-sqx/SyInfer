@@ -3,7 +3,7 @@
 
 Buffer::Buffer(size_t size, std::shared_ptr<DeviceAlloc> allocator, 
 base::DeviceType type): allocator_(allocator), device_type_(type), size_(size){
-    
+
 }
 
 Buffer::~Buffer(){

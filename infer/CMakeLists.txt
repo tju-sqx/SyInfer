@@ -11,4 +11,4 @@ add_library(infer
 target_include_directories(infer PUBLIC include)
 
 # 链接Armadillo库
-target_link_libraries(infer PUBLIC armadillo)
+target_link_libraries(infer PUBLIC armadillo glog::glog)
