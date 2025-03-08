@@ -1,3 +1,4 @@
+# ... existing code ...
 # 设置CMake最低版本要求
 cmake_minimum_required(VERSION 3.14)
 
@@ -8,31 +9,24 @@ project(SyInfer VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB INFER_SOURCES "infer/src/*.cpp")
-
-#外部依赖
+# 外部依赖
 find_package(Armadillo REQUIRED)
 find_package(GTest REQUIRED)
 find_package(glog REQUIRED)
 
-# 包含头文件目录
+# 添加infer子目录
+add_subdirectory(infer)
+
 # 添加可执行文件
-add_executable(SyInfer
-    ${INFER_SOURCES}
-    infer/infer.cpp
-)
+add_executable(SyInfer infer/infer.cpp)
 
 # 包含头文件目录
 target_include_directories(SyInfer PUBLIC
     ${CMAKE_SOURCE_DIR}/infer/include
 )
 
-# 添加库（如果有）
-target_link_libraries(SyInfer PRIVATE armadillo gtest glog::glog)
-
-# 安装目标（可选）
-
-add_subdirectory(infer)
+# 链接库
+target_link_libraries(SyInfer PRIVATE infer armadillo gtest glog::glog)
 
 # 测试（可选）
 enable_testing()
