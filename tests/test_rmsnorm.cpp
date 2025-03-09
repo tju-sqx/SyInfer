@@ -110,6 +110,7 @@ TEST(test_rmsnorm, cpu_exception_test) {
         Tensor output{size_1, base::DateType::DATA_FP32, allocator_cpu};
         Tensor weight{size_2, base::DateType::DATA_FP32, allocator_cpu};
 
-        EXPECT_DEATH(kernel::rmsnorm_kernel_cpu(input, weight, output, nullptr), ".*");
+        EXPECT_EXIT(kernel::rmsnorm_kernel_cpu(input, weight, output, nullptr), 
+                   ::testing::KilledBySignal(SIGABRT), ".*");
     }
 }

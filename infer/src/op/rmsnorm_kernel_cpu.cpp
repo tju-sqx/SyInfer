@@ -1,6 +1,5 @@
-#include "rmsnorm_kernel_cpu.h"
-#include <armadillo>
 #include <glog/logging.h>
+#include "rmsnorm_kernel_cpu.h"
 
 namespace kernel {
     void rmsnorm_kernel_cpu(const Tensor& t_input, const Tensor& t_weight, Tensor& t_output, void* ptr) {

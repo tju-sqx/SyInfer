@@ -1,5 +1,5 @@
-#include "swiglu_kernel_cpu.h"
 #include <glog/logging.h>
+#include "swiglu_kernel_cpu.h"
 
 void kernel::swiglu_kernel_cpu(const Tensor& t_input_1, const Tensor& t_input_2, Tensor& t_output, void* ptr){
     CHECK(t_input_1.device_type() == t_input_2.device_type() 
