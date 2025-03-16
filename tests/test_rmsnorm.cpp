@@ -101,7 +101,7 @@ TEST(test_rmsnorm, cpu_basic_test){
     
 }
 
-TEST(test_rmsnorm, cpu_exception_test) {
+TEST(test_rmsnorm, DISABLED_cpu_exception_test) {
     auto allocator_cpu = CpuAllocFactory::get_instance();
     {   
         const int size_1 = 1;

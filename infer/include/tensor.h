@@ -16,16 +16,20 @@ private:
 
 public:
     explicit Tensor(size_t dim0, base::DateType data_type, std::shared_ptr<DeviceAlloc> alloc_ptr);
+    explicit Tensor(size_t dim0, size_t dim1, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator);
     ~Tensor() = default;
     size_t dim() const;
     bool create();
     base::DeviceType device_type() const;
+    const bool empty() const;
+    const size_t get_dim(size_t idx) const;
     template<typename T> 
     const T* data() const;
 
     template<typename T>
     T* data(); 
 
+    
     const size_t size() const{
         return size_;
     }
