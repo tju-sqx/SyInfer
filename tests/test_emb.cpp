@@ -31,6 +31,7 @@ TEST(test_emb, basic_test_cpu) {
             9.0f, 10.0f, 11.0f, 12.0f // token 2
         };
 
+
         std::memcpy(t_input.data<float>(), input_data, input_size * sizeof(float));
         std::memcpy(t_weight.data<float>(), weight_data, vocab_size * embedding_dim * sizeof(float));
 
