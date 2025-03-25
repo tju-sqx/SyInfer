@@ -32,3 +32,28 @@ TEST(test_gemv, basic_test_cpu) {
         }                                                                                                                                             
     }   
 }
+
+TEST(test_gemv, DISABLED_cpu_exception_test) {
+    auto allocator_cpu = CpuAllocFactory::get_instance();
+    {
+        size_t dim = 3;
+        Tensor input{dim, base::DateType::DATA_FP32, allocator_cpu};
+        Tensor weight{dim, 4, base::DateType::DATA_FP32, allocator_cpu};
+        Tensor output{dim, base::DateType::DATA_FP32, allocator_cpu};
+
+        input.create();
+        output.create();
+        weight.create();
+
+        for(size_t i = 0; i < dim; ++i) {
+            *(input.data<float>() + i) = static_cast<float>(i + 1);
+        }
+
+        for(size_t i = 0; i < dim * dim; ++i) {
+            *(weight.data<float>() + i) = static_cast<float>(i + 1);
+        }
+
+        EXPECT_EXIT(kernel::matmul_kernel_cpu(input, weight, output);, 
+                   ::testing::KilledBySignal(SIGABRT), ".*");                                                                                                                                       
+    }   
+}

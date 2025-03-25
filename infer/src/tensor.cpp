@@ -1,23 +1,26 @@
 #include "tensor.h"
 #include "glog/logging.h"
-Tensor::Tensor(size_t dim0, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator): data_type_(data_type) {
+Tensor::Tensor(size_t dim0, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator, void* external_ptr): data_type_(data_type), external_ptr_(external_ptr) {
     dims_.push_back(dim0);
     size_ = cal_size();
     bytes_size_ = size_ * data_type_size(data_type_);
-    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator->device_type());
+    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator->device_type(), external_ptr != nullptr? true : false);
 }
 
-Tensor::Tensor(size_t dim0, size_t dim1, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator): data_type_(data_type) {
+Tensor::Tensor(size_t dim0, size_t dim1, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator, void* external_ptr): data_type_(data_type), external_ptr_(external_ptr){
     dims_.push_back(dim0);
     dims_.push_back(dim1);
     size_ = cal_size();
     bytes_size_ = size_ * data_type_size(data_type_);
-    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator->device_type());
+    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator->device_type(), external_ptr != nullptr? true : false);
 }   
 
 bool Tensor::create(){
-    if(!buffer_ptr_ ) {
+    if (!buffer_ptr_) {
         return false;
+    }           
+    if (external_ptr_) {
+        return buffer_ptr_->init_from_external(external_ptr_);
     }
     return buffer_ptr_->create();
 }
@@ -51,4 +54,16 @@ base::DeviceType Tensor::device_type() const {
         return base::DeviceType::UNKNOWN;
     }
     return buffer_ptr_->device_type();
+}
+
+const bool Tensor::is_from_external() const {
+    return external_ptr_ != nullptr;
+}
+
+const bool Tensor::set_external_data(void* external_ptr) {
+    if(buffer_ptr_) {
+        buffer_ptr_->set_use_external();
+        return buffer_ptr_->init_from_external(external_ptr);
+    }
+    return false;
 }
