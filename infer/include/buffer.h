@@ -15,6 +15,7 @@ public:
     size_t size() const;
     const bool is_use_external() const {return use_external_;}
     void set_use_external() {use_external_ = true;}
+    void set_device_type(base::DeviceType type) {device_type_ = type;}
     base::DeviceType device_type() const{
         return device_type_;
     }

@@ -1,10 +1,12 @@
 #include "tensor.h"
+#include "base.h"
 #include "glog/logging.h"
+#include <iostream>
 Tensor::Tensor(size_t dim0, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator, void* external_ptr): data_type_(data_type), external_ptr_(external_ptr) {
     dims_.push_back(dim0);
     size_ = cal_size();
     bytes_size_ = size_ * data_type_size(data_type_);
-    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator->device_type(), external_ptr != nullptr? true : false);
+    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator? allocator->device_type() : base::DeviceType::CPU, external_ptr_ != nullptr? true : false);
 }
 
 Tensor::Tensor(size_t dim0, size_t dim1, base::DateType data_type, std::shared_ptr<DeviceAlloc> allocator, void* external_ptr): data_type_(data_type), external_ptr_(external_ptr){
@@ -12,7 +14,7 @@ Tensor::Tensor(size_t dim0, size_t dim1, base::DateType data_type, std::shared_p
     dims_.push_back(dim1);
     size_ = cal_size();
     bytes_size_ = size_ * data_type_size(data_type_);
-    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator->device_type(), external_ptr != nullptr? true : false);
+    buffer_ptr_ = std::make_shared<Buffer>(bytes_size_, allocator, allocator? allocator->device_type() : base::DeviceType::CPU, external_ptr_? true : false);
 }   
 
 bool Tensor::create(){
@@ -20,7 +22,10 @@ bool Tensor::create(){
         return false;
     }           
     if (external_ptr_) {
-        return buffer_ptr_->init_from_external(external_ptr_);
+        
+        bool flag = buffer_ptr_->init_from_external(external_ptr_);
+        //std::cout<<"init from external end()\n";
+        return flag;
     }
     return buffer_ptr_->create();
 }

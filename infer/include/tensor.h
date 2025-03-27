@@ -27,6 +27,10 @@ public:
     const size_t get_dim(size_t idx) const;
     const bool is_from_external() const;
     const bool set_external_data(void* ptr);
+    void set_device_type(base::DeviceType type) {
+        buffer_ptr_->set_device_type(type);
+    }
+
     template<typename T> 
     const T* data() const;
 

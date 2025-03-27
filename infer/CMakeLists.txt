@@ -1,4 +1,4 @@
-file(GLOB INFER_SOURCES "src/*.cpp" "src/op/*.cpp")
+file(GLOB INFER_SOURCES "src/*.cpp" "src/op/*.cpp" "src/op/cpu_kernel/*.cpp" "src/op/gpu_kernel/*.cpp")  
 # 添加库
 add_library(infer STATIC
     ${INFER_SOURCES}
@@ -8,6 +8,8 @@ add_library(infer STATIC
 target_include_directories(infer PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include/op
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/op/cpu_kernel
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/op/gpu_kernel
 )
 
 # 链接库
