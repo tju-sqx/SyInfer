@@ -10,8 +10,8 @@ class DeviceAlloc{
 public:
     DeviceAlloc(base::DeviceType type): device_alloc_type_(type) {};
     ~DeviceAlloc() = default;
-    virtual void* allocate(size_t size) = 0;
-    virtual void deallocate(void* ptr) = 0;
+    virtual void* allocate(size_t size) const = 0;
+    virtual void deallocate(void* ptr) const = 0;
     
     base::DeviceType device_type() const{
         return device_alloc_type_;
