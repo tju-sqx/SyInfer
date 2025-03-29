@@ -2,8 +2,12 @@
 #define TENSOR_H
 
 #include <vector>
+#include "base.h"
 #include "buffer.h"
 #include <glog/logging.h>
+#include <cuda_device_runtime_api.h>
+#include <cuda_runtime.h>
+
 class Tensor {
 private:
     size_t size_;
@@ -27,6 +31,10 @@ public:
     const size_t get_dim(size_t idx) const;
     const bool is_from_external() const;
     const bool set_external_data(void* ptr);
+    void to_cuda(cudaStream_t stream);
+    void to_cpu();
+    void clone();
+    
     void set_device_type(base::DeviceType type) {
         buffer_ptr_->set_device_type(type);
     }

@@ -25,6 +25,13 @@ namespace base{
         DATA_INT16 = 3
     };
 
+    enum class DataTransMode: uint8_t{
+        CPU2CPU = 1,
+        CPU2CUDA = 2,
+        CUDA2CPU = 3,
+        CUDA2CUDA = 4,
+    };
+    
     int32_t data_type_size(DateType data_type);
     
 }

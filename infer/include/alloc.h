@@ -12,7 +12,7 @@ public:
     ~DeviceAlloc() = default;
     virtual void* allocate(size_t size) const = 0;
     virtual void deallocate(void* ptr) const = 0;
-    
+    void smemcpy(const void* src_ptr, void* dest_ptr, size_t byte_size, base::DataTransMode mode, void* stream = nullptr, bool need_sync = false);
     base::DeviceType device_type() const{
         return device_alloc_type_;
     }

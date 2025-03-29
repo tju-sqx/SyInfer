@@ -2,9 +2,9 @@
 #define ALLOC_GPU_H
 
 #include "alloc.h"
-#include <memory>
-#include <unordered_map>
+#include <map>
 #include <vector>
+#include <memory>
 
 struct CudaMem {
     void* data;
@@ -22,9 +22,9 @@ public:
     void* allocate(size_t size) const override;
     void deallocate(void* ptr) const override;
 private:
-    mutable std::unordered_map<int, size_t> not_free_mems_size_;
-    mutable std::unordered_map<int, std::vector<CudaMem>> common_mems_;
-    mutable std::unordered_map<int, std::vector<CudaMem>> big_mems_;
+    mutable std::map<int, size_t> not_free_mems_size_;
+    mutable std::map<int, std::vector<CudaMem>> common_mems_;
+    mutable std::map<int, std::vector<CudaMem>> big_mems_;
 };
 
 

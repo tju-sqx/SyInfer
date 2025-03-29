@@ -33,7 +33,7 @@ int main(){
     std::cout<<"is delete or not"<<(!ptr4)<<std::endl;
 
     auto buffer_ptr = std::make_shared<Buffer>(32, only_allocater, base::DeviceType::CPU);
-    std::cout<<"Buffer size "<<buffer_ptr->size()<<std::endl;
+    std::cout<<"Buffer size "<<buffer_ptr->byte_size()<<std::endl;
     Buffer buffer{32, only_allocater, base::DeviceType::CPU};
 
     {

@@ -13,8 +13,8 @@ void* GpuAlloc::allocate(size_t byte_size) const {
         int select_id = -1;
         for (size_t i = 0; i < cur_big_mems.size(); ++i) {
             if(cur_big_mems[i].byte_size >= byte_size && !cur_big_mems[i].busy &&
-            cur_big_mems[i].byte_size - byte_size < 1 * 1024 * 1024) {
-                if(select_id == -1 || cur_big_mems[i] < cur_big_mems[select_id]) {
+            cur_big_mems[i].byte_size - byte_size < static_cast<size_t>(1 * 1024 * 1024)) {
+                if(select_id == -1 || cur_big_mems[i].byte_size < cur_big_mems[select_id].byte_size) {
                     select_id = i;
                 }
             }
@@ -40,14 +40,14 @@ void* GpuAlloc::allocate(size_t byte_size) const {
     
     auto& cur_mems = common_mems_[id];
     for (size_t i = 0; i < cur_mems.size(); ++i) {
-        if (cur_mems[i].byte_size >= byte_size && cur_mems[i].busy) {
+        if (cur_mems[i].byte_size >= byte_size && !cur_mems[i].busy) {
             cur_mems[i].busy = true;
             not_free_mems_size_[id] -= cur_mems[i].byte_size;
             return cur_mems[i].data;
         }
     }
     void* data_ptr = nullptr;
-    state = cudaMalloc(byte_size);
+    state = cudaMalloc(&data_ptr ,byte_size);
     if(state != cudaSuccess) {
         char buf[256];
         snprintf(buf, 256,
@@ -57,7 +57,7 @@ void* GpuAlloc::allocate(size_t byte_size) const {
         LOG(ERROR) << buf;
         return nullptr;
     }
-    common_mems_.emplace(data_ptr, byte_size, true);
+    common_mems_[id].emplace_back(data_ptr, byte_size, true);
     return data_ptr;
 }
 

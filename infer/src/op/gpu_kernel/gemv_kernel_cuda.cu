@@ -1,6 +1,7 @@
-#include "gemv_kernel_cuda.cuh"
-#include <cstddef>
+#include <cub/block/block_reduce.cuh>
+#include <cstdint>
 
+#include "gemv_kernel_cuda.cuh"
 
 namespace kernel {
 template<size_t THREAD_PER_BLOCK, size_t ROW_PRE_BLOCK>
@@ -8,7 +9,7 @@ __global__ void matmul_kernel_cuda_fp32(const float* input_ptr, const float* wei
         __shared__ float dot_mul_res[THREAD_PER_BLOCK];
         size_t tid = threadIdx.x;
 
-        size_t start_row = blockIdx.x * THREAD_PER_BLOCK;
+        size_t start_row = blockIdx.x * ROW_PRE_BLOCK;
         size_t end_row = start_row + ROW_PRE_BLOCK;
         if(start_row >= ROW) {
             return;
@@ -28,8 +29,8 @@ __global__ void matmul_kernel_cuda_fp32(const float* input_ptr, const float* wei
                 float4* cur_input_ptr = input_4_ptr + p;
                 float4* cur_weight_ptr  = weight_4_ptr + p;
 
-                float part_sum = cur_input_ptr.x * cur_weight_ptr.x + cur_input_ptr.y + cur_weight_ptr.y +
-                                    cur_input_ptr.z * cur_weight_ptr.z + cur_input_ptr.w + cur_weight_ptr.w;
+                float part_sum = cur_input_ptr->x * cur_weight_ptr->x + cur_input_ptr->y + cur_weight_ptr->y +
+                                    cur_input_ptr->z * cur_weight_ptr->z + cur_input_ptr->w + cur_weight_ptr->w;
                 dot_mul_res[tid] += part_sum;
             }
 
@@ -40,7 +41,7 @@ __global__ void matmul_kernel_cuda_fp32(const float* input_ptr, const float* wei
             __syncthreads();
 
             using BlockReduce = cub::BlockReduce<float, THREAD_PER_BLOCK>;
-            __share__ typename BlockReduce::TempStorage temp;
+            __shared__ typename BlockReduce::TempStorage temp;
             float sum = BlockReduce(temp).Sum(dot_mul_res[tid]);
 
             __syncthreads();
@@ -53,7 +54,7 @@ __global__ void matmul_kernel_cuda_fp32(const float* input_ptr, const float* wei
         }
     }
 
-    void gemv_kernel_cuda(const Tensor& input_tensor, const Tensor& weight_tensor, const Tensor& output_tensor, float scale = 1.0f) {
+    void gemv_kernel_cuda(const Tensor& input_tensor, const Tensor& weight_tensor, const Tensor& output_tensor, float scale) {
         CHECK(!input_tensor.empty() && input_tensor.dim() <= 2) << "Input_tensor is empty OR has invalid dims in gemv\n ";
         CHECK(input_tensor.device_type() == base::DeviceType::GPU) << "Input tensor runs with wrong device in gemv!\n";
 
