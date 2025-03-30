@@ -17,10 +17,6 @@ TEST(test_scale_sum, basic_test_cpu) {
         Tensor value_tensor {(step) * (pos + 1), base::DateType::DATA_FP32, allocator_cpu};
         Tensor output_tensor{head_size, base::DateType::DATA_FP32, allocator_cpu};
         
-        score_tensor.create();
-        value_tensor.create();
-        output_tensor.create();
-        
         // 填充输入数据
         float score_data[pos + 1] = {0.5f, 0.3f, 0.2f};
         float value_data[(pos + 1) * step] = {
@@ -40,8 +36,7 @@ TEST(test_scale_sum, basic_test_cpu) {
         value_tensor.set_device_type(device_type);
         output_tensor.set_device_type(device_type);
         
-        Tensor value_vec = Tensor{head_size, base::DateType::DATA_FP32, nullptr, (const_cast<float*>(value_tensor.data<float>()))};
-        value_vec.create();
+        Tensor value_vec = Tensor{head_size, base::DateType::DATA_FP32, nullptr, (const_cast<float*>(value_tensor.data<float>())), false};
         value_vec.set_device_type(base::DeviceType::CPU);
         // 调用被测函数
         kernel::scale_sum_kernel(score_tensor, value_vec, output_tensor, head_size, pos, step);

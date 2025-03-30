@@ -11,10 +11,6 @@ TEST(test_swiglu, cpu_basic_test) {
         Tensor t_input_1{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor t_input_2{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
-        
-        t_input_1.create();
-        t_input_2.create();
-        output.create();
 
         float expected_output[4];
         float inputs_1[4]{1.0f, 0.0f, -1.0f, 2.0f};
@@ -46,10 +42,6 @@ TEST(test_swiglu, cpu_basic_test) {
         Tensor t_input_1{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor t_input_2{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
-        
-        t_input_1.create();
-        t_input_2.create();
-        output.create();
 
         float inputs_1[size] = {100.0f, -100.0f, 0.0f};  // 极大值，极小值，零
         float inputs_2[size] = {1.0f, 1.0f, 1.0f};

@@ -13,7 +13,6 @@ TEST(test_tensor, to_cuda) {
         const size_t size = 1024 * 1024 * 1024;
         //Tensor t_1{size, base::DateType::DATA_FP32, allocator_gpu};
         Tensor t_1{size, base::DateType::DATA_FP32, allocator_cpu};
-        t_1.create();
         float* ptr = t_1.data<float>();
         *(ptr) = static_cast<float>(0);
         *(ptr + size - 1) = static_cast<float>(size);
@@ -21,9 +20,7 @@ TEST(test_tensor, to_cuda) {
 
         const float eps = 1e-5;
         t_1.to_cuda(nullptr);
-      
         float* cuda_ptr = t_1.data<float>();
-
 
         EXPECT_TRUE(t_1.byte_size() == 4 * size);
         EXPECT_TRUE(t_1.device_type() == base::DeviceType::GPU);
@@ -38,7 +35,6 @@ TEST(test_tensor, to_cpu) {
         const size_t size = 1024;
 
         Tensor t_1{size, base::DateType::DATA_FP32, allocator_cpu};
-        t_1.create();
         float* ptr = t_1.data<float>();
 
         std::random_device rd;
@@ -54,7 +50,6 @@ TEST(test_tensor, to_cpu) {
 
         //cuda指针不能操作
         t_1.to_cuda(nullptr);
-    
         t_1.to_cpu();
        
         float* cpu_ptr = t_1.data<float>();   
@@ -75,7 +70,6 @@ TEST(test_tensor, external_date_test) {
     {
         const size_t size = 4;
         Tensor t_1{size, base::DateType::DATA_FP32, allocator_cpu};
-        t_1.create();
         float* ptr = t_1.data<float>();
         for(int i = 0; i < 4; ++i) {
             *(ptr + i) = static_cast<float>(i + 1);
@@ -84,7 +78,6 @@ TEST(test_tensor, external_date_test) {
         {
             Tensor t_2{size, base::DateType::DATA_FP32, allocator_cpu, ptr};
             EXPECT_TRUE(t_2.is_from_external());
-            EXPECT_TRUE(t_2.create());
             float* ptr_2 = t_2.data<float>();
             const float eps = 1e-5;
             for(int i = 0; i < 4; ++i) {

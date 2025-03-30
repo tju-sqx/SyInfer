@@ -92,11 +92,6 @@ TEST(test_rope, basic_test_cpu) {
         Tensor sin_cache{head_size * (pos + 1), base::DateType::DATA_FP32, allocator_cpu};
         Tensor cos_cache{head_size * (pos + 1), base::DateType::DATA_FP32, allocator_cpu};
         
-        pos_input.create();
-        k_input.create();
-        q_input.create();
-        sin_cache.create();
-        cos_cache.create();   
         // 填充输入数据
         size_t pos_data = pos;
         float k_data[dim_size] = {1.0f, 2.0f, 3.0f, 4.0f};

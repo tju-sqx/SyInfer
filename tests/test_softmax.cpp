@@ -10,9 +10,6 @@ TEST(test_softmax, basic_test_cpu) {
 
         Tensor t_input{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
-        
-        t_input.create();
-        output.create();
 
         float inputs[4] = {1.0f, 2.0f, 3.0f, 4.0f};
         float expected_output[4];
@@ -55,9 +52,6 @@ TEST(test_softmax, basic_test_cpu) {
 
         Tensor t_input{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
-        
-        t_input.create();
-        output.create();
 
         float inputs[3] = {0.0f, 0.0f, 0.0f};
         const float expected_val = 1.0f / 3.0f;
@@ -82,9 +76,6 @@ TEST(test_softmax, basic_test_cpu) {
         Tensor t_input{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
         
-        t_input.create();
-        output.create();
-
         float inputs[2] = {1000.0f, 1001.0f};
         const float diff = 1001.0f - 1000.0f;
         const float expected = 1.0f / (1.0f + std::exp(-diff));

@@ -5,7 +5,7 @@
 #include "tensor.h"
 #include "rmsnorm_kernel_cpu.h"
 
-#define LOG(M) std::cout<<M<<std::endl;
+
 int main(){
 
     CpuAlloc allocator{};

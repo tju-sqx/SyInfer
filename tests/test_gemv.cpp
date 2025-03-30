@@ -47,13 +47,6 @@ TEST(test_gemv, basic_test_gpu) {
         Tensor weight_gpu{dim, dim, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output_gpu{dim, base::DateType::DATA_FP32, allocator_cpu};
 
-        input_cpu.create();
-        weight_cpu.create();
-        output_cpu.create();
-
-        input_gpu.create();
-        weight_gpu.create();
-        output_gpu.create();
 
         for(size_t i = 0; i < dim; ++i) {
             *(input_cpu.data<float>() + i) = static_cast<float>(i + 1);
@@ -92,7 +85,6 @@ TEST(test_gemv, basic_test_gpu) {
         const size_t size = 1024;
 
         Tensor t_1{size, base::DateType::DATA_FP32, allocator_cpu};
-        t_1.create();
         float* ptr = t_1.data<float>();
 
         std::random_device rd;
@@ -108,7 +100,6 @@ TEST(test_gemv, basic_test_gpu) {
 
         //cuda指针不能操作
         t_1.to_cuda(nullptr);
-    
         t_1.to_cpu();
        
         float* cpu_ptr = t_1.data<float>();   
@@ -130,10 +121,6 @@ TEST(test_gemv, DISABLED_cpu_exception_test) {
         Tensor input{dim, base::DateType::DATA_FP32, allocator_cpu};
         Tensor weight{dim, 4, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{dim, base::DateType::DATA_FP32, allocator_cpu};
-
-        input.create();
-        output.create();
-        weight.create();
 
         for(size_t i = 0; i < dim; ++i) {
             *(input.data<float>() + i) = static_cast<float>(i + 1);

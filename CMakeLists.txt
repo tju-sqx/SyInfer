@@ -8,11 +8,17 @@ project(SyInfer VERSION 1.0 LANGUAGES CXX)
 # 设置C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#设置cuda标准
+set(CMAKE_CUDA_STANDARD 14)
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_ARCHITECTURES "70;75;80;86") # 根据您的GPU型号调整
 
 # 外部依赖
 find_package(Armadillo REQUIRED)
 find_package(GTest REQUIRED)
 find_package(glog REQUIRED)
+find_package(CUDA REQUIRED)
 
 # 添加infer子目录
 add_subdirectory(infer)
@@ -26,7 +32,7 @@ target_include_directories(SyInfer PUBLIC
 )
 
 # 链接库
-target_link_libraries(SyInfer PRIVATE infer armadillo gtest glog::glog)
+target_link_libraries(SyInfer PRIVATE infer armadillo gtest glog::glog ${CUDA_LIBRARIES})
 
 # 测试（可选）
 enable_testing()

@@ -17,9 +17,6 @@ TEST(test_rmsnorm, cpu_basic_test){
         Tensor input{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor weight{size, base::DateType::DATA_FP32, allocator_cpu};
-        input.create();
-        output.create();
-        weight.create();
 
         float inputs[4]{1.0f, 2.0f, 3.0f, 4.0f};
         float weights[4]{0.5f, 0.5f,0.5f, 0.5f};
@@ -48,9 +45,6 @@ TEST(test_rmsnorm, cpu_basic_test){
         Tensor input{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor weight{size, base::DateType::DATA_FP32, allocator_cpu};
-        input.create();
-        output.create();
-        weight.create();
 
         auto input_data = input.data<float>();
         auto weight_data = weight.data<float>();
@@ -72,9 +66,6 @@ TEST(test_rmsnorm, cpu_basic_test){
         Tensor input{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor output{size, base::DateType::DATA_FP32, allocator_cpu};
         Tensor weight{size, base::DateType::DATA_FP32, allocator_cpu};
-        input.create();
-        output.create();
-        weight.create();
 
         auto input_data = input.data<float>();
         auto weight_data = weight.data<float>();

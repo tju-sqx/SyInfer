@@ -24,25 +24,11 @@ TEST_F(test_mha, basic_test) {
     // 创建测试数据
     const size_t pos = 2;  // 当前位置，测试处理前3个token的情况
     
-    // 创建query tensor (head_num * head_size)
     Tensor query_tensor{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
-    ASSERT_TRUE(query_tensor.create());
-    
-    // 创建key tensor (seq_len * kv_dim)
     Tensor key_tensor{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
-    ASSERT_TRUE(key_tensor.create());
-    
-    // 创建value tensor (seq_len * kv_dim)
     Tensor value_tensor{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
-    ASSERT_TRUE(value_tensor.create());
-    
-    // 创建score tensor (head_num * seq_len)
     Tensor score_tensor{head_num * seq_len, base::DateType::DATA_FP32, allocator_cpu};
-    ASSERT_TRUE(score_tensor.create());
-    
-    // 创建输出 tensor (head_num * head_size)
     Tensor mha_out{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
-    ASSERT_TRUE(mha_out.create());
     
     // 初始化query数据
     float* query_ptr = query_tensor.data<float>();
@@ -94,13 +80,7 @@ TEST_F(test_mha, CorrectCalculation) {
     Tensor value_tensor{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
     Tensor score_tensor{head_num * seq_len, base::DateType::DATA_FP32, allocator_cpu};
     Tensor mha_out{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
-    
-    query_tensor.create();
-    key_tensor.create();
-    value_tensor.create();
-    score_tensor.create();
-    mha_out.create();
-    
+        
     // 用简单数据初始化
     float* query_ptr = query_tensor.data<float>();
     float* key_ptr = key_tensor.data<float>();
@@ -169,14 +149,7 @@ TEST_F(test_mha, ZeroPosition) {
     Tensor value_tensor{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
     Tensor score_tensor{head_num * seq_len, base::DateType::DATA_FP32, allocator_cpu};
     Tensor mha_out{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
-    
-    query_tensor.create();
-    key_tensor.create();
-    value_tensor.create();
-    score_tensor.create();
-    mha_out.create();
-    
-    // 用1.0初始化所有数据
+        // 用1.0初始化所有数据
     float* query_ptr = query_tensor.data<float>();
     float* key_ptr = key_tensor.data<float>();
     float* value_ptr = value_tensor.data<float>();

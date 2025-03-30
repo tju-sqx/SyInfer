@@ -15,10 +15,6 @@ TEST(test_emb, basic_test_cpu) {
         Tensor t_weight{vocab_size, embedding_dim, base::DateType::DATA_FP32, allocator_cpu};
         Tensor t_output{input_size, embedding_dim, base::DateType::DATA_FP32, allocator_cpu};
         
-        t_input.create();
-        t_weight.create();
-        t_output.create();
-
         // 填充输入数据
         float input_data[input_size] = {0.0f, 2.0f};  // token ids
         float weight_data[vocab_size * embedding_dim] = {
@@ -61,9 +57,6 @@ TEST(test_emb, DISABLED_cpu_exception_test){
         Tensor t_weight{vocab_size, embedding_dim, base::DateType::DATA_FP32, allocator_cpu};
         Tensor t_output{input_size, embedding_dim, base::DateType::DATA_FP32, allocator_cpu};
         Tensor t_empty{0, base::DateType::DATA_FP32, allocator_cpu};
-        t_input.create();
-        t_weight.create();
-        t_output.create();
 
         // 测试空输入
         EXPECT_EXIT(kernel::emb_kernel_cpu(t_empty, t_weight, t_output, nullptr), 
