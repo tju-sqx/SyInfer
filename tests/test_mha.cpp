@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
+#include "base.h"
 #include "mha_kernel.h"
 #include "tensor.h"
 #include "alloc_cpu.h"
+#include "mha_kernel_cuda.cuh"
 #include <cmath>
 #include <memory>
 
@@ -182,3 +184,71 @@ TEST_F(test_mha, ZeroPosition) {
         EXPECT_NEAR(output_ptr[i], expected_value, eps);
     }
 }
+
+TEST_F(test_mha, basic_test_gpu) {
+    const size_t pos = 2;  // 当前位置，测试处理前3个token的情况
+    
+    Tensor query_tensor{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor key_tensor{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor value_tensor{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor score_tensor{head_num * seq_len, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor mha_out{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
+
+    Tensor query_tensor_gpu{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor key_tensor_gpu{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor value_tensor_gpu{seq_len * kv_dim, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor score_tensor_gpu{head_num * seq_len, base::DateType::DATA_FP32, allocator_cpu};
+    Tensor mha_out_gpu{head_num * head_size, base::DateType::DATA_FP32, allocator_cpu};
+    
+    // 初始化query数据
+    float* query_ptr = query_tensor.data<float>();
+    float* query_ptr_gpu =query_tensor_gpu.data<float>();
+    for (size_t i = 0; i < head_num * head_size; ++i) {
+        query_ptr[i] = 0.1f * (i + 1);
+        query_ptr_gpu[i] = 0.1f * (i + 1);
+    }
+    
+    // 初始化key数据
+    float* key_ptr = key_tensor.data<float>();
+    float* key_ptr_gpu =key_tensor_gpu.data<float>();
+    for (size_t i = 0; i < seq_len * kv_dim; ++i) {
+        key_ptr[i] = 0.05f * (i + 1);
+        key_ptr_gpu[i] = 0.05f * (i + 1);
+    }
+    
+    // 初始化value数据
+    float* value_ptr = value_tensor.data<float>();
+    float* value_ptr_gpu = value_tensor_gpu.data<float>();
+    for (size_t i = 0; i < seq_len * kv_dim; ++i) {
+        value_ptr[i] = 0.2f * (i + 1);
+        value_ptr_gpu[i] = 0.2f * (i + 1);
+    }
+    
+    // 设置设备类型
+    base::DeviceType device_type = base::DeviceType::CPU;
+    
+    //执行MHA计算
+    kernel::mha_kernel(pos, seq_len, kv_dim, head_num, head_size, kv_mul, layer_idx,
+                       mha_out, query_tensor, key_tensor, value_tensor, score_tensor, device_type);
+
+    mha_out_gpu.to_cuda(nullptr);
+    query_tensor_gpu.to_cuda(nullptr);
+    key_tensor_gpu.to_cuda(nullptr);
+    score_tensor_gpu.to_cuda(nullptr);   
+    value_tensor_gpu.to_cuda(nullptr);
+
+    kernel::mha_cuda_kernel(pos, seq_len, kv_dim, head_num, head_size, kv_mul, layer_idx, mha_out_gpu, query_tensor_gpu, key_tensor_gpu, value_tensor_gpu,
+     score_tensor_gpu, base::DeviceType::GPU);
+    
+    // 验证结果
+    // 这里只做基本的非零检查，因为具体数值需要手动计算或使用参考实现进行比较
+    mha_out_gpu.to_cpu();
+
+    float* output_ptr = mha_out.data<float>();
+    float* output_ptr_gpu = mha_out_gpu.data<float>();
+    const float eps = 1e-5;
+    for (size_t i = 0; i < head_num * head_size; ++i) {
+        EXPECT_NEAR(output_ptr[i], output_ptr_gpu[i], eps) << "i: "<< i << "\n";
+    }
+}
+

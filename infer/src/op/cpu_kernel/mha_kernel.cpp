@@ -4,11 +4,12 @@
 #include "softmax_kernel_cpu.h"
 #include "matmul_kernel_cpu.h"
 #include "scale_sum_kernel.h"
+#include <cstdio>
 #include <glog/logging.h>
 
 namespace kernel {
     void mha_kernel(size_t pos, size_t seq_len, size_t kv_dim, size_t head_num, size_t head_size, size_t kv_mul, size_t layer_idx,
-    const Tensor& mha_out, const Tensor& query_tensor, const Tensor& key_tensor, const Tensor& value_tensor, const Tensor& score_tensor, base::DeviceType& device_type) {
+    const Tensor& mha_out, const Tensor& query_tensor, const Tensor& key_tensor, const Tensor& value_tensor, const Tensor& score_tensor, base::DeviceType device_type) {
         size_t layer_offset = layer_idx * seq_len * kv_dim;
         float scale = 1.0f / std::sqrt(static_cast<float>(head_size));
 
@@ -41,9 +42,8 @@ namespace kernel {
 
             Tensor score_vec{pos + 1, base::DateType::DATA_FP32, nullptr, score_ptr};
             score_vec.create();
-            score_vec.set_device_type(device_type);
+            score_vec.set_device_type(device_type);  
             softmax_kernel_cpu(score_vec, nullptr);
-
             float* mha_out_ptr = const_cast<float*>(mha_out.data<float>()) + h * head_size;
             allocator->memset_zero(mha_out_ptr, sizeof(float) * head_size);
             Tensor output_vec = Tensor{head_size, base::DateType::DATA_FP32, nullptr, mha_out_ptr};

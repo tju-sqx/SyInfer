@@ -5,8 +5,8 @@ set(CMAKE_CUDA_STANDARD 17)         # 使用C++17标准
 set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB INFER_SOURCES "src/*.cpp" "src/op/*.cpp" "src/op/cpu_kernel/*.cpp" "src/op/gpu_kernel/*.cpp") 
-file(GLOB CUDA_SOURCES "src/op/gpu_kernel/*.cu")
-
+file(GLOB CUDA_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/op/gpu_kernel/*.cu")
+message(STATUS "CUDA source files: ${CUDA_SOURCES}")
 project(infer LANGUAGES CXX CUDA) 
 # 添加库
 add_library(infer STATIC
