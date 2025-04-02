@@ -1,5 +1,8 @@
+#include <cstddef>
 #include <gtest/gtest.h>
+#include "base.h"
 #include "rope_kernel_cpu.h"
+#include "rope_kernel_cuda.cuh"
 #include "tensor.h"
 #include "alloc_cpu.h"
 #include <cmath>
@@ -76,6 +79,49 @@ TEST(test_rope, sin_cos_calc_test) {
     }
 }
 
+TEST(test_rope, sin_cos_calc_gpu_test) {
+    auto alloc_cpu = CpuAllocFactory::get_instance();
+    {
+        const size_t head_size = 4;
+        const size_t max_len_size = 3;
+        
+        Tensor sin_cache{head_size * max_len_size, base::DateType::DATA_FP32, alloc_cpu, nullptr};
+        Tensor cos_cache{head_size * max_len_size, base::DateType::DATA_FP32, alloc_cpu, nullptr};
+
+        Tensor sin_cache_gpu{head_size * max_len_size, base::DateType::DATA_FP32, alloc_cpu, nullptr};
+        Tensor cos_cache_gpu{head_size * max_len_size, base::DateType::DATA_FP32, alloc_cpu, nullptr};
+        
+        sin_cache_gpu.to_cuda(nullptr);
+        cos_cache_gpu.to_cuda(nullptr);
+
+        float* sin_ptr = sin_cache.data<float>();
+        float* cos_ptr = cos_cache.data<float>();
+
+        kernel::sin_cos_calc(head_size, max_len_size, sin_ptr, cos_ptr);
+        kernel::sin_cos_calc_cuda(head_size, max_len_size, sin_cache_gpu, cos_cache_gpu, nullptr);
+
+        sin_cache_gpu.to_cpu();
+        cos_cache_gpu.to_cpu();
+
+        // 验证结果
+        auto sin_cache_ptr = sin_cache_gpu.data<float>();
+        auto cos_cache_ptr = cos_cache_gpu.data<float>();
+        for (size_t pos = 0; pos < max_len_size; ++pos) {
+            for (size_t head_dim = 0; head_dim < head_size; ++head_dim) {
+                size_t offset = pos * head_size + head_dim;
+                float sin_cpu = sin_ptr[offset];
+                float cos_cpu = cos_ptr[offset];
+
+                const float eps = 1e-5;
+                EXPECT_NEAR(sin_cpu, *(sin_cache_ptr + offset), eps)
+                    << "Position: " << pos << ", Head dim: " << head_dim;
+                EXPECT_NEAR(cos_cpu, *(cos_cache_ptr + offset), eps)
+                    << "Position: " << pos << ", Head dim: " << head_dim;
+            }
+        }
+    }
+}
+
 TEST(test_rope, basic_test_cpu) {
     auto allocator_cpu = CpuAllocFactory::get_instance();
     {
@@ -136,6 +182,71 @@ TEST(test_rope, basic_test_cpu) {
         // 验证q_input
         for(size_t i = 0; i < dim_size; ++i){
             EXPECT_NEAR(q_output[i], expected_q[i], eps) << "i: "<<i<<"\n";
+        }
+    }
+}
+
+TEST(test_rope, basic_test_gpu) {
+    auto allocator_cpu = CpuAllocFactory::get_instance();
+    {
+        // 准备测试数据
+        const size_t dim_size = 4;
+        const size_t k_size = 2;
+        const size_t head_size = 2;
+        const size_t pos = 1;
+
+        // 创建Tensor对象
+        Tensor pos_input{1, base::DateType::DATA_INT8, allocator_cpu};
+        Tensor key_tensor_cpu{dim_size, base::DateType::DATA_FP32, allocator_cpu};
+        Tensor query_tensor_cpu{dim_size, base::DateType::DATA_FP32, allocator_cpu};
+        Tensor sin_cache{head_size * (pos + 1), base::DateType::DATA_FP32, allocator_cpu};
+        Tensor cos_cache{head_size * (pos + 1), base::DateType::DATA_FP32, allocator_cpu};
+        
+        Tensor key_tensor_gpu{dim_size, base::DateType::DATA_FP32, allocator_cpu};
+        Tensor query_tensor_gpu{dim_size, base::DateType::DATA_FP32, allocator_cpu};
+
+        float* sin_cache_ptr = sin_cache.data<float>();
+        float* cos_cache_ptr = cos_cache.data<float>();
+        kernel::sin_cos_calc(head_size, 2, sin_cache_ptr, cos_cache_ptr);
+
+        size_t pos_data = pos;
+        float k_data[dim_size] = {1.0f, 2.0f, 3.0f, 4.0f};
+        float q_data[dim_size] = {5.0f, 6.0f, 7.0f, 8.0f};
+     
+
+        std::memcpy(pos_input.data<size_t>(), &pos_data, sizeof(size_t));
+        //cpu
+        std::memcpy(key_tensor_cpu.data<float>(), k_data, dim_size * sizeof(float));
+        std::memcpy(query_tensor_cpu.data<float>(), q_data, dim_size * sizeof(float));
+        //gpu
+        std::memcpy(key_tensor_gpu.data<float>(), k_data, dim_size * sizeof(float));
+        std::memcpy(query_tensor_gpu.data<float>(), q_data, dim_size * sizeof(float));
+
+        kernel::rope_kernel_cpu(dim_size, k_size, head_size, pos_input, key_tensor_cpu, query_tensor_cpu, sin_cache, cos_cache);
+
+        key_tensor_gpu.to_cuda(nullptr);
+        query_tensor_gpu.to_cuda(nullptr);
+        sin_cache.to_cuda(nullptr);
+        cos_cache.to_cuda(nullptr);
+        
+        kernel::rope_kernel_cuda(dim_size, k_size, head_size, pos_input, key_tensor_gpu, query_tensor_gpu, sin_cache, cos_cache, nullptr);
+       
+        key_tensor_gpu.to_cpu();
+        query_tensor_gpu.to_cpu();
+        
+        const float* key_ptr_cpu = key_tensor_cpu.data<float>();
+        const float* query_ptr_cpu = query_tensor_cpu.data<float>();
+        const float* key_ptr_gpu = key_tensor_gpu.data<float>();
+        const float* query_ptr_gpu = query_tensor_gpu.data<float>();
+
+        const float eps = 1e-5;
+
+        for(size_t i = 0; i < dim_size; ++i){
+            EXPECT_NEAR(key_ptr_cpu[i], key_ptr_gpu[i], eps) << "i: "<<i<<"\n";
+        }
+        
+        for(size_t i = 0; i < dim_size; ++i){
+            EXPECT_NEAR(query_ptr_cpu[i], query_ptr_gpu[i], eps) << "i: "<<i<<"\n";
         }
     }
 }

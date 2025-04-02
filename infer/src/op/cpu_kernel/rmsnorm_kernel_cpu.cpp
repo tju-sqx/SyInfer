@@ -20,7 +20,6 @@ namespace kernel {
  
         const float mean = arma::as_scalar(arma::mean(arma::pow(input_tensor, 2))) + eps;
         const float rsqrt = 1.f / std::sqrt(mean);
-        
         out_tensor = weight_tensor % (rsqrt * input_tensor);
     }
 
